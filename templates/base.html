@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AI Electricity Bill Analyzer{% endblock %}</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block body %}{% endblock %}
+
+  <script>
+    (function() {
+      function setDynamicDay() {
+        var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        var currentDay = days[new Date().getDay()];
+        var heroDay = document.getElementById('hero-day');
+        if (heroDay) {
+          heroDay.textContent = currentDay;
+        }
+        var eyebrows = document.querySelectorAll('.eyebrow');
+        eyebrows.forEach(function(el) {
+          if (el.textContent.toLowerCase().includes('energy snapshot')) {
+            el.innerHTML = '<span id="hero-day">' + currentDay + '</span>, your energy snapshot';
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setDynamicDay);
+      } else {
+        setDynamicDay();
+      }
+      window.addEventListener('load', setDynamicDay);
+      var count = 0;
+      var timer = setInterval(function() {
+        setDynamicDay();
+        count++;
+        if (count > 10) clearInterval(timer);
+      }, 300);
+    })();
+  </script>
+</body>
+</html>

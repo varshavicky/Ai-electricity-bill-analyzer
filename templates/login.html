@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Login | AI Electricity Bill Analyzer{% endblock %}
+{% block body %}
+<main class="auth-page">
+  <section class="auth-intro">
+    <a class="brand auth-brand" href="{{ url_for('login') }}"><span class="brand-mark">⚡</span> WattWise</a>
+    <div class="intro-content">
+      <span class="intro-kicker">SMART ENERGY, SIMPLIFIED</span>
+      <h1>Know your energy.<br><em>Change your future.</em></h1>
+      <p>One clear view of your electricity usage, bill forecast, and the small habits that help your home use less.</p>
+      <div class="intro-cards">
+        <div><strong>01</strong><span>Predict your<br>monthly bill</span></div>
+        <div><strong>02</strong><span>Discover your<br>energy patterns</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-side">
+    <form method="post" class="auth-card">
+      <div class="mobile-brand"><span class="brand-mark">⚡</span> WattWise</div>
+      <span class="form-kicker">WELCOME BACK</span>
+      <h2>Sign in to your<br><span>energy space.</span></h2>
+      <p class="form-subtitle">Continue making smarter decisions for your home.</p>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" placeholder="Enter email" required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" placeholder="Enter password" required>
+      </label>
+      <button type="submit" class="primary-btn">Continue <span>→</span></button>
+      <p class="auth-switch">New to WattWise? <a href="{{ url_for('register') }}">Create an account</a></p>
+    </form>
+  </section>
+</main>
+{% endblock %}

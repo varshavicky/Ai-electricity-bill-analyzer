@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}History | WattWise{% endblock %}
+{% block body %}
+<main class="shell app-shell">
+  <nav class="topbar glassbar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">⚡</span> WattWise</a>
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}">Overview</a>
+      <a href="{{ url_for('insights') }}">Insights</a>
+      <a class="active" href="{{ url_for('history_page') }}">History</a>
+      <a class="nav-action" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </nav>
+
+  <section class="page-heading">
+    <div><span class="eyebrow dark-eyebrow">Your saved activity</span><h1>Reports</h1><p>Every estimate in one place, so you can spot the habits that move your bill.</p></div>
+    <a href="{{ url_for('index') }}" class="secondary-btn">+ New estimate</a>
+  </section>
+
+  <section class="panel history-page-panel">
+    <div class="history-toolbar"><div><span class="mini-label">All predictions</span><h2>{{ history|length }} saved estimates</h2></div><span class="filter-chip">Last 24 records</span></div>
+    <div class="table-wrap">
+      <table class="wide-table">
+        <thead><tr><th>Date</th><th>Usage</th><th>Bill estimate</th><th>AC</th><th>Heater</th><th>Lights</th><th>Status</th><th>Report</th></tr></thead>
+        <tbody>
+        {% for row in history|reverse %}
+          <tr><td><strong>{{ row.Date[:10] }}</strong><small>{{ row.Date[11:] }}</small></td><td>{{ row.Units_Consumed }} kWh</td><td><strong>Rs. {{ row.Bill_Amount }}</strong></td><td>{{ row.ac }} hrs</td><td>{{ row.geyser }} hrs</td><td>{{ row.lights }} hrs</td><td><span class="status {{ 'danger' if row.Bill_Amount|float > 2000 else 'ok' }}">{{ 'High' if row.Bill_Amount|float > 2000 else 'Normal' }}</span></td><td><a class="secondary-btn" href="{{ url_for('report', row=row.idx) }}">Download PDF</a></td></tr>
+        {% else %}
+          <tr><td colspan="8" class="empty-table">No predictions yet. Start with a new estimate.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | AI Electricity Bill Analyzer{% endblock %}
+{% block body %}
+  <main class="shell dashboard-shell">
+    <nav class="topbar glassbar">
+      <div>
+        <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">⚡</span> WattWise</a>
+      </div>
+      <div class="nav-links">
+        <a class="active" href="{{ url_for('index') }}">Overview</a>
+        <a href="{{ url_for('insights') }}">Insights</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+        <a class="nav-action" href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </nav>
+
+     <section class="hero dashboard-hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span id="hero-day">{{ current_day }}</span>, your energy snapshot</p>
+        <h1>Make every unit count.</h1>
+        <p class="summary">Predict your next bill, understand what is driving your usage, and build smarter energy habits with AI-powered recommendations.</p>
+        <div class="hero-meta"><span class="live-dot"></span> Model updated today <span class="hero-divider">/</span> {{ metrics.records }} learning records</div>
+      </div>
+    </section>
+
+    <section class="stat-grid">
+      <article class="stat-card"><span class="stat-icon mint">◒</span><div><span class="stat-label">Latest estimate</span><strong>{% if result %}Rs. {{ result.bill }}{% else %}—{% endif %}</strong><small>{% if result %}Based on your current inputs{% else %}Run an analysis to see this{% endif %}</small></div></article>
+      <article class="stat-card"><span class="stat-icon sun">◌</span><div><span class="stat-label">Predicted usage</span><strong>{% if result %}{{ result.units }} kWh{% else %}—{% endif %}</strong><small>Monthly consumption</small></div></article>
+      <article class="stat-card"><span class="stat-icon blue">↗</span><div><span class="stat-label">Next month trend</span><strong>{% if result %}Rs. {{ result.next_bill }}{% else %}—{% endif %}</strong><small>Forecasted bill</small></div></article>
+    </section>
+
+    <section class="workspace">
+      <form method="post" id="manual-form" class="panel form-panel appliance-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="mini-label">Your home profile</span>
+            <h2>How do you use energy?</h2>
+          </div>
+          <span class="step-count">01 / 02</span>
+        </div>
+
+        <div class="appliance-grid">
+          {% for appliance in appliances %}
+          <div class"appliance-card">
+            <div class="appliance-header">
+              <span class="appliance-name">{{ display_names[appliance] }}</span>
+              <span class="unit-badge">{{ units_map[appliance] }}</span>
+            </div>
+            <div class="slider-group">
+              <input
+                type="range"
+                id="range_{{ appliance }}"
+                min="0"
+                max="{{ max_vals[appliance] }}"
+                step="{{ steps[appliance] }}"
+                value="{{ selected[appliance] }}"
+                oninput="syncNum('{{ appliance }}', this.value)"
+              >
+              <input
+                type="number"
+                id="num_{{ appliance }}"
+                name="{{ appliance }}"
+                min="0"
+                max="{{ max_vals[appliance] }}"
+                step="{{ steps[appliance] }}"
+                value="{{ selected[appliance] }}"
+                oninput="syncRange('{{ appliance }}', this.value)"
+              >
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="primary-btn">Calculate my estimate <span>→</span></button>
+        <a href="{{ url_for('report') }}" class="btn">Download Report</a>
+        <a href="#" onclick="showTab('upload'); return false;" style="display:block; margin-top:10px; text-align:center;">Or upload EB bill instead</a>
+      </form>
+      <<form method="post" id="upload-form" action="{{ url_for('upload_bill') }}" enctype="multipart/form-data" class="panel" style="display:none;">
+  <label class="mini-label">Upload EB bill (PDF)</label><br>
+  <input type="file" name="bill" accept=".pdf" required>
+  <button type="submit" class="primary-btn" style="margin-top:8px;">Upload &amp; Analyze</button>
+  <a href="#" onclick="showTab('manual'); return false;" style="display:block; margin-top:10px; text-align:center;">Or enter usage manually</a>
+</form>
+
+      <aside class="panel result-panel insight-panel">
+        <div class="status danger" style="display:block; margin-bottom:10px;">⚠️ Budget exceeded! Bill Rs. {{ result.bill }} is above your budget Rs. {{ budget }}</div>
+{% if budget and result and result.bill > budget %}
+<div class="status danger" style="display:block; margin-bottom:10px;">⚠️ Budget exceeded! Bill Rs. {{ result.bill }} is above your budget Rs. {{ budget }}</div>
+{% elif budget and result %}
+<div class="status ok" style="display:block; margin-bottom:10px;">✔️ Within budget (Rs. {{ budget }})</div>
+{% endif %}
+<form method="post" action="{{ url_for('set_budget') }}" style="margin-bottom:12px;">
+  <label class="mini-label">Monthly budget (Rs)</label><br>
+  <input type="number" name="budget" min="0" step="50" value="{{ budget or '' }}" required>
+  <button type="submit" class="secondary-btn">Set</button>
+</form>
+        {% if result %}
+          <div class="result-topline">
+            <span class="status {{ 'danger' if result.status == 'High Bill' else 'ok' }}">{{ result.status }}</span>
+          </div>
+          <div class="bill-focus">
+            <span>Predicted Bill</span>
+            <strong>Rs. {{ result.bill }}</strong>
+          </div>
+          <div class="numbers">
+            <div>
+              <span>Units Consumed</span>
+              <strong>{{ result.units }}</strong>
+            </div>
+            <div>
+              <span>Next Month</span>
+              <strong>Rs. {{ result.next_bill }}</strong>
+            </div>
+          </div>
+          <div class="forecast">
+            <span>Next Month Units</span>
+            <strong>{{ result.next_units }} units</strong>
+          </div>
+          <p class="suggestion">{{ result.suggestion }}</p>
+        {% else %}
+          <div class="empty energy-empty">
+            <span>See your energy story</span>
+            <p>Adjust the sliders, then calculate an estimate to unlock your bill forecast and personalised saving plan.</p>
+            <div class="empty-orbit">⚡</div>
+          </div>
+        {% endif %}
+      </aside>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="mini-label">Saved Records</span>
+          <h2>Recent Prediction History</h2>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Units</th>
+              <th>Bill</th>
+              <th>TV (hrs)</th>
+              <th>AC (hrs)</th>
+              <th>Heater (hrs)</th>
+              <th>Lights (hrs)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in history %}
+            <tr>
+              <td>{{ row.Date }}</td>
+              <td>{{ row.Units_Consumed }}</td>
+              <td>Rs. {{ row.Bill_Amount }}</td>
+              <td><span class="pill">{{ row.tv }}</span></td>
+              <td><span class="pill">{{ row.ac }}</span></td>
+              <td><span class="pill">{{ row.geyser }}</span></td>
+              <td><span class="pill">{{ row.lights }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7">No prediction history yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function syncNum(id, val) {
+      document.getElementById('num_' + id).value = val;
+    }
+    function syncRange(id, val) {
+      document.getElementById('range_' + id).value = val;
+    }
+  </script>
+  <script>
+function showTab(t) {
+  var m = document.getElementById('manual-form');
+  var u = document.getElementById('upload-form');
+  m.style.display = (t === 'manual') ? '' : 'none';
+  u.style.display = (t === 'upload') ? '' : 'none';
+}
+</script>
+{% endblock %}

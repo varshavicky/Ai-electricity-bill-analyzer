@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="100%" height="100%">
+  <defs>
+    <!-- Deep Night Sky Gradient -->
+    <linearGradient id="nightSky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050b14" />
+      <stop offset="40%" stop-color="#0a192f" />
+      <stop offset="75%" stop-color="#0d2b3a" />
+      <stop offset="100%" stop-color="#071a24" />
+    </linearGradient>
+
+    <!-- Electric Cyan Glow -->
+    <linearGradient id="electricGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#4facfe" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#00c6ff" stop-opacity="0.2" />
+    </linearGradient>
+
+    <!-- Neon Glow Filter -->
+    <filter id="neonBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <radialGradient id="moonGlow" cx="80%" cy="20%" r="40%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#050b14" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Deep Night Sky -->
+  <rect width="1600" height="1000" fill="url(#nightSky)" />
+  <circle cx="1200" cy="200" r="500" fill="url(#moonGlow)" />
+
+  <!-- Distant Mountain/Horizon Silhouette -->
+  <path d="M 0 750 Q 400 680 800 730 T 1600 700 L 1600 1000 L 0 1000 Z" fill="#03070d" opacity="0.9" />
+
+  <!-- Power Grid Lines (High Voltage Transmission) -->
+  <g stroke="url(#electricGlow)" stroke-width="2.5" fill="none" filter="url(#neonBlur)">
+    <!-- Main High Line Traces -->
+    <path d="M -100 320 Q 450 480 1000 360 T 1700 300" />
+    <path d="M -100 360 Q 450 520 1000 400 T 1700 340" />
+    <path d="M -100 400 Q 450 560 1000 440 T 1700 380" />
+
+    <path d="M -100 550 Q 500 680 1100 580 T 1700 520" opacity="0.6" stroke-width="1.8" />
+    <path d="M -100 580 Q 500 710 1100 610 T 1700 550" opacity="0.6" stroke-width="1.8" />
+  </g>
+
+  <!-- Transmission Tower Silhouettes -->
+  <g fill="#020509" stroke="#00f2fe" stroke-width="1.2" stroke-opacity="0.7">
+    <!-- Main Tower Left/Center -->
+    <path d="M 950 350 L 1050 350 M 930 400 L 1070 400 M 900 450 L 1100 450 M 980 280 L 1020 280 M 1000 250 L 1000 850 M 980 280 L 880 850 M 1020 280 L 1120 850" />
+    <path d="M 980 280 L 1070 400 M 1020 280 L 930 400 M 930 400 L 1100 450 M 1070 400 L 900 450 M 900 450 L 1120 850 M 1100 450 L 880 850" />
+    
+    <!-- Secondary Far Tower -->
+    <g transform="translate(-550, 80) scale(0.65)" opacity="0.8">
+      <path d="M 950 350 L 1050 350 M 930 400 L 1070 400 M 900 450 L 1100 450 M 980 280 L 1020 280 M 1000 250 L 1000 850 M 980 280 L 880 850 M 1020 280 L 1120 850" />
+      <path d="M 980 280 L 1070 400 M 1020 280 L 930 400 M 930 400 L 1100 450 M 1070 400 L 900 450 M 900 450 L 1120 850 M 1100 450 L 880 850" />
+    </g>
+  </g>
+
+  <!-- Glowing Insulator & Node Spark Points -->
+  <g fill="#38bdf8" filter="url(#neonBlur)">
+    <circle cx="950" cy="350" r="4" />
+    <circle cx="1050" cy="350" r="4" />
+    <circle cx="930" cy="400" r="4.5" />
+    <circle cx="1070" cy="400" r="4.5" />
+    <circle cx="900" cy="450" r="5" />
+    <circle cx="1100" cy="450" r="5" />
+  </g>
+</svg>

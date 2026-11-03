@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Register | AI Electricity Bill Analyzer{% endblock %}
+{% block body %}
+<main class="auth-page">
+  <section class="auth-intro">
+    <a class="brand auth-brand" href="{{ url_for('register') }}"><span class="brand-mark">⚡</span> WattWise</a>
+    <div class="intro-content">
+      <span class="intro-kicker">A BETTER ENERGY ROUTINE</span>
+      <h1>Start with one<br><em>simple decision.</em></h1>
+      <p>Build a clearer picture of your home energy and turn everyday usage into meaningful savings.</p>
+      <div class="intro-cards">
+        <div><strong>01</strong><span>Track your<br>home usage</span></div>
+        <div><strong>02</strong><span>Make every unit<br>count</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-side">
+    <form method="post" class="auth-card">
+      <div class="mobile-brand"><span class="brand-mark">⚡</span> WattWise</div>
+      <span class="form-kicker">GET STARTED</span>
+      <h2>Create your<br><span>energy space.</span></h2>
+      <p class="form-subtitle">Your personalized electricity dashboard starts here.</p>
+      <label class="field">
+        <span>Name</span>
+        <input type="text" name="name" placeholder="Enter name" required>
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" name="email" placeholder="Enter email" required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" placeholder="Minimum 6 characters" minlength="6" required>
+      </label>
+      <label class="field">
+        <span>Confirm Password</span>
+        <input type="password" name="confirm_password" placeholder="Repeat password" minlength="6" required>
+      </label>
+      <button type="submit" class="primary-btn">Create account <span>→</span></button>
+      <p class="auth-switch">Already using WattWise? <a href="{{ url_for('login') }}">Sign in</a></p>
+    </form>
+  </section>
+</main>
+{% endblock %}

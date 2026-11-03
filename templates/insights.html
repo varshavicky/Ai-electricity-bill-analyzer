@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Insights | WattWise{% endblock %}
+{% block body %}
+<main class="shell app-shell">
+  <nav class="topbar glassbar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">⚡</span> WattWise</a>
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}">Overview</a>
+      <a class="active" href="{{ url_for('insights') }}">Insights</a>
+      <a href="{{ url_for('history_page') }}">History</a>
+      <a class="nav-action" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </nav>
+
+  <section class="page-heading">
+    <div><span class="eyebrow dark-eyebrow">Personal energy intelligence</span><h1>Your energy insights</h1><p>Small patterns add up. Here is what your recent predictions say about your home.</p></div>
+    <div class="profile-chip"><span class="avatar">{{ user.name[0]|upper }}</span><span>{{ user.name }}</span></div>
+  </section>
+
+  <section class="insight-stats">
+    <article class="insight-stat"><span class="stat-label">Average bill</span><strong>Rs. {{ average_bill }}</strong><span class="trend neutral">Across your predictions</span></article>
+    <article class="insight-stat"><span class="stat-label">Average usage</span><strong>{{ average_units }} <small>kWh</small></strong><span class="trend positive">Keep building consistency</span></article>
+    <article class="insight-stat accent-stat"><span class="stat-label">Highest bill</span><strong>Rs. {{ highest_bill }}</strong><span class="trend warning">Your peak to watch</span></article>
+  </section>
+
+  <section class="insight-layout">
+    <article class="panel chart-panel">
+      <div class="panel-heading compact-heading"><div><span class="mini-label">Your recent activity</span><h2>Bill movement</h2></div><span class="chart-key"><i></i> Predicted bill</span></div>
+      {% if history %}
+      <div class="bar-chart">
+        {% for row in history[-8:] %}
+        <div class="bar-column"><span class="bar-value">Rs. {{ row.Bill_Amount }}</span><div class="bar" style="height: {{ [18, (row.Bill_Amount|float / (highest_bill or 1) * 150)]|max }}px"></div><small>{{ row.Date[:10] }}</small></div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty chart-empty"><span>Your chart is waiting</span><p>Complete your first analysis to start tracking movement.</p></div>
+      {% endif %}
+    </article>
+    <article class="panel model-panel">
+      <span class="mini-label">Prediction engine</span><h2>Built for your home</h2>
+      <div class="model-score"><strong>{{ metrics.r2 }}</strong><span>model<br>confidence</span></div>
+      <p>WattWise learns from appliance combinations and usage patterns to make your estimate more relevant over time.</p>
+      <div class="model-detail"><span>Training records</span><strong>{{ metrics.records }}</strong></div>
+      <div class="model-detail"><span>Average error</span><strong>{{ metrics.mae }} units</strong></div>
+    </article>
+  </section>
+
+  <section class="panel recommendations-panel">
+    <div class="panel-heading compact-heading"><div><span class="mini-label">Personalised actions</span><h2>Three ways to save this month</h2></div><span class="recommendation-score">Based on your profile</span></div>
+    <div class="recommendation-grid">
+      <div class="recommendation"><span class="recommendation-number">01</span><h3>Cool smarter</h3><p>Set your AC one degree higher and use sleep mode after midnight.</p><span class="saving-tag">Potentially saves 8-12%</span></div>
+      <div class="recommendation"><span class="recommendation-number">02</span><h3>Batch your laundry</h3><p>Run full loads instead of several small cycles throughout the week.</p><span class="saving-tag">Less standby energy</span></div>
+      <div class="recommendation"><span class="recommendation-number">03</span><h3>Switch off the idle</h3><p>Unplug chargers and devices that stay warm even when you are not using them.</p><span class="saving-tag">Easy daily win</span></div>
+    </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const hist = {{ history|tojson }};
+if (hist.length) {
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: hist.map(r => r.Date.slice(5, 10)),
+      datasets: [
+        {label: 'Units (kWh)', data: hist.map(r => r.Units_Consumed), borderColor: '#0f766e', yAxisID: 'y'},
+        {label: 'Bill (Rs)', data: hist.map(r => r.Bill_Amount), borderColor: '#f97316', yAxisID: 'y1'}
+      ]
+    },
+    options: {scales: {y: {position: 'left'}, y1: {position: 'right', grid: {drawOnChartArea: false}}}}
+  });
+
+  const last = hist[hist.length - 1];
+  const rates = {tv: 4.97, fan: 3.05, ac: 17.97, refrigerator: 1.95, washing_machine: 9.08, geyser: 13.92, lights: 2.03};
+  const names = {tv: 'TV', fan: 'Fan', ac: 'AC', refrigerator: 'Refrigerator', washing_machine: 'Washing Machine', geyser: 'Heater', lights: 'Lights'};
+  const keys = Object.keys(rates).filter(k => last[k] > 0);
+  if (keys.length) {
+    new Chart(document.getElementById('pieChart'), {
+      type: 'doughnut',
+      data: {labels: keys.map(k => names[k]), datasets: [{data: keys.map(k => last[k] * rates[k])}]}
+    });
+  }
+}
+</script>
+</main>
+{% endblock %}
